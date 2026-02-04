@@ -56,7 +56,11 @@ export const deleteUser=async(req,res)=>{
 }
 export const getUserAll=async(req,res)=>{
     try {
-        const users=await prisma.user.findMany()
+        const users=await prisma.user.findMany({
+            include:{posts:{
+                select:{title:true,description:true,comments_count:true}
+            }}
+        })
         res.status(200).json({message:"Users fetched",users})
     } catch (error) {
         res.status(500).json({message:"Something went wrong",error})

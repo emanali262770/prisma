@@ -73,14 +73,29 @@ export const deletePost=async(req,res)=>{
         res.status(500).json({message:"Something went wrong",error})
     }
 }
-export const getPostAll=async(req,res)=>{
-    try {
-        const post=await prisma.post.findMany()
-        res.status(200).json({message:"Post fetched",post})
-    } catch (error) {
-        res.status(500).json({message:"Something went wrong",error})
-    }
-}
+export const getPostAll = async (req, res) => {
+  try {
+    const post = await prisma.post.findMany({
+      orderBy: { createdAt: "desc" },   // ✅ latest post first
+
+      include: {
+        comments: {
+          orderBy: { createdAt: "desc" }, // ✅ latest comment first
+          include: {
+            user: {
+              select: { name: true, email: true },
+            },
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Post fetched", post });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error });
+  }
+};
+
 
 
 export const getPostById=async(req,res)=>{
